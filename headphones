@@ -1,0 +1,27 @@
+function clean_html($dirty_html, $config = FALSE){
+   if (is_array($dirty_html)) {
+      foreach ($dirty_html as $key => $val) {
+          $clean_html[$key] = clean_html($val, $config);
+      }
+   } else {
+      require_once(__DIR__ .'/../library/HTMLPurifier.auto.php');
+      $config = HTMLPurifier_Config::createDefault();
+      $config->set('Core.Encoding', 'UTF-8');
+      $config->set('HTML.Allowed', 'b,strong,i,em,u,a[href|title],ul,ol,li,p[style|class],br,span[style|class],img[style|class|width|height|src],span,br,h1,h2,h3,h4,h5,blockquote');
+      $config->set('CSS.AllowedProperties', 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,color,background-color,text-align,max-width,border,width');
+      $config->set('HTML.SafeIframe', true);
+      $config->set('URI.SafeIframeRegexp', '%^http://(www.youtube(?:-nocookie)?.com/embed/|player.vimeo.com/video/)%');
+      $config->set("AutoFormat.AutoParagraph", false);
+      $config->set('AutoFormat.Linkify', TRUE);
+      $config->set('HTML.Trusted', true);
+      $config->set('AutoFormat.RemoveEmpty.RemoveNbsp', true);
+      $config->set("AutoFormat.RemoveEmpty", true);
+      $config->set("Core.NormalizeNewlines", true);
+      $config->set('HTML.Nofollow', true);
+      $config->set('HTML.TargetBlank', true);
+      $config->set("CSS.MaxImgLength", null);
+      $purifier = new HTMLPurifier($config);
+      $clean_html = $purifier->purify($dirty_html);
+   }
+     return $clean_html;
+}
